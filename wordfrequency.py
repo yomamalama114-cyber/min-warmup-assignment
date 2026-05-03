@@ -1,3 +1,4 @@
+from enum import nonmember
 from pathlib import Path
 import sys
 
@@ -10,17 +11,27 @@ import sys
 # noen enkelte funskjoner som trengs for det hele til å virke.
 # Enhver funksjon kommer med en dokumentasjon som forklarer hva skal gjøres.
 
-
 def read_file(file_name):
     """
     Denne funksjonen får et filnavn som argument og skal gi
     tilbake en liste av tekststrenger som representerer linjene i filen.
     """
+    with open(file_name, mode='r', encoding='utf-8', errors='replace') as f:
+        lines = f.read().splitlines()
     # Tips: kanksje "open"-funksjonen kunne være nyttig her: https://docs.python.org/3/library/functions.html#open
-    return NotImplemented  # TODO: Du må erstatte denne linjen
+    return lines  # TODO: Du må erstatte denne linjen
 
 
 def lines_to_words(lines):
+    words = []
+    for line in lines:
+        for word in line.split():
+            clean_word = word.strip(".,:;?!")
+            clean_word = clean_word.lower()
+
+            if clean_word:
+                words.append(clean_word)
+
     """
     Denne funksjonen får en liste med strenger som input (dvs. linjene av tekstfilen som har nettopp blitt lest inn)
     og deler linjene opp i enkelte ord. Enhver linje blir delt opp der det er blanktegn (= whitespaces).
@@ -32,13 +43,23 @@ def lines_to_words(lines):
 
     F. eks: Inn: ["Det er", "bare", "noen få ord"], Ut: ["Det", "er", "bare", "noen", "få", "ord"]
     """
-    # Tips: se på "split()"-funksjonen https://docs.python.org/3/library/stdtypes.html#str.split
+
+
+    # Tips: se på "split()"-funksjonen
     # i tillegg kan "strip()": https://docs.python.org/3/library/stdtypes.html#str.strip
     # og "lower()": https://docs.python.org/3/library/stdtypes.html#str.lower være nyttig
-    return NotImplemented  # TODO: Du må erstatte denne linjen
+    return words  # TODO: Du må erstatte denne linjen
 
 
 def compute_frequency(words):
+    freq = {}
+
+    for word in words:
+        if word in freq:
+            freq[word] += 1
+        else:
+
+            freq[word] = 1
     """
     Denne funksjonen tar inn en liste med ord og så lager den en frekvenstabell ut av den. En frekvenstabell
     teller hvor ofte hvert ord dykket opp i den opprinnelige input listen. Frekvenstabllen
@@ -46,13 +67,20 @@ def compute_frequency(words):
 
     F. eks. Inn ["hun", "hen", "han", "hen"], Ut: {"hen": 2, "hun": 1, "han": 1}
     """
-    return NotImplemented  # TODO: Du må erstatte denne linjen
+    return freq  # TODO: Du må erstatte denne linjen
 
 
 FILL_WORDS = ['og', 'dei', 'i', 'eg', 'som', 'det', 'han', 'til', 'skal', 'på', 'for', 'då', 'ikkje', 'var', 'vera']
 
 
 def remove_filler_words(frequency_table):
+
+    clean_table = {}
+
+    for word, count in frequency_table.items():
+        if word not in FILL_WORDS:
+            clean_table[word] = count
+
     """
     Ofte inneholder tekst koblingsord som "og", "eller", "jeg", "da". Disse er ikke så spennende når man vil
     analysere innholdet til en tekst. Derfor vil vi gjerne fjerne dem fra vår frekvenstabell.
@@ -60,10 +88,16 @@ def remove_filler_words(frequency_table):
     Målet med denne funksjonen er at den skal få en frekvenstabll som input og så fjerne alle fyll-ord
     som finnes i FILL_WORDS.
     """
-    return NotImplemented  # TODO: Du må erstatte denne linjen
+    return clean_table  # TODO: Du må erstatte denne linjen
 
 
 def largest_pair(par_1, par_2):
+    if par_1[1] > par_2[1]:
+        return par_1
+    elif par_2[1] > par_1[1]:
+        return par_2
+    else:
+        return par_1
     """
     Denne funksjonen får som input to tupler/par (https://docs.python.org/3/library/stdtypes.html#tuple) der den
     første komponenten er en string (et ord) og den andre komponenten er en integer (heltall).
@@ -76,6 +110,17 @@ def largest_pair(par_1, par_2):
 
 
 def find_most_frequent(frequency_table):
+    most_frequent = None
+
+    for pair in frequency_table.items():
+        if most_frequent is None:
+            most_frequent = pair
+
+    else:
+        most_frequent = largest_pair(most_frequent, pair)
+
+    return most_frequent
+
     """
     Nå er det på tide å sette sammen alle bitene du har laget.
     Den funksjonen får frekvenstabllen som innputt og finner det ordet som dykket opp flest.
